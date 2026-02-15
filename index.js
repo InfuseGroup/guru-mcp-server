@@ -205,6 +205,25 @@ server.tool(
   }
 );
 
+// --- delete_card ---
+server.tool(
+  "delete_card",
+  "Delete a Guru card by its ID.",
+  {
+    cardId: z.string().describe("The Guru card ID to delete"),
+  },
+  async ({ cardId }) => {
+    try {
+      await guruFetch(`/cards/${cardId}`, { method: "DELETE" });
+      return {
+        content: [{ type: "text", text: JSON.stringify({ deleted: true, cardId }, null, 2) }],
+      };
+    } catch (err) {
+      return { content: [{ type: "text", text: `Error deleting card: ${err.message}` }], isError: true };
+    }
+  }
+);
+
 // --- verify_card ---
 server.tool(
   "verify_card",
