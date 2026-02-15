@@ -139,6 +139,39 @@ server.tool(
   }
 );
 
+// --- create_card ---
+server.tool(
+  "create_card",
+  "Create a new Guru card in a specified collection.",
+  {
+    title: z.string().describe("The card title"),
+    content: z.string().describe("HTML content for the card"),
+    collectionId: z.string().describe("The collection ID to create the card in"),
+    shareStatus: z.enum(["TEAM", "PRIVATE"]).optional().default("TEAM").describe("Card visibility (TEAM or PRIVATE, defaults to TEAM)"),
+  },
+  async ({ title, content, collectionId, shareStatus }) => {
+    try {
+      const body = {
+        preferredPhrase: title,
+        content,
+        collection: { id: collectionId },
+        shareStatus,
+      };
+
+      const { data } = await guruFetch("/cards/extended", {
+        method: "POST",
+        body: JSON.stringify(body),
+      });
+
+      return {
+        content: [{ type: "text", text: JSON.stringify(data, null, 2) }],
+      };
+    } catch (err) {
+      return { content: [{ type: "text", text: `Error creating card: ${err.message}` }], isError: true };
+    }
+  }
+);
+
 // --- update_card ---
 server.tool(
   "update_card",
