@@ -8,8 +8,12 @@ Stdio-based [MCP](https://modelcontextprotocol.io/) server that wraps the [Guru 
 |------|-------------|
 | `list_cards` | Search/filter cards by verification status, collection, verifier, and search terms. Paginated (50/page). |
 | `get_card` | Get a single card's full content and metadata by ID. |
+| `create_card` | Create a new card in a specified collection. |
 | `update_card` | Update a card's title or HTML content. |
+| `delete_card` | Delete a card by ID. |
 | `verify_card` | Mark a card as verified, resetting its verification timer. |
+| `list_groups` | List all groups in the Guru team. |
+| `set_verifier` | Set the verifier for a card to a user or group. Replaces any existing verifier. |
 
 ## Setup
 
