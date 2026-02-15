@@ -245,6 +245,55 @@ server.tool(
   }
 );
 
+// --- list_groups ---
+server.tool(
+  "list_groups",
+  "List all groups in the Guru team. Returns group IDs, names, and whether they are modifiable.",
+  {},
+  async () => {
+    try {
+      const { data } = await guruFetch("/groups");
+      return {
+        content: [{ type: "text", text: JSON.stringify(data, null, 2) }],
+      };
+    } catch (err) {
+      return { content: [{ type: "text", text: `Error listing groups: ${err.message}` }], isError: true };
+    }
+  }
+);
+
+// --- set_verifier ---
+server.tool(
+  "set_verifier",
+  "Set the verifier for a Guru card. Can be a user (by email) or a group (by group ID). Replaces any existing verifier.",
+  {
+    cardId: z.string().describe("The Guru card ID"),
+    type: z.enum(["user", "user-group"]).describe("Verifier type: 'user' for an individual or 'user-group' for a group"),
+    verifierId: z.string().describe("The verifier's email (for user type) or group UUID (for user-group type)"),
+  },
+  async ({ cardId, type, verifierId }) => {
+    try {
+      let verifier;
+      if (type === "user") {
+        verifier = { type: "user", user: { email: verifierId } };
+      } else {
+        verifier = { type: "user-group", userGroup: { id: verifierId } };
+      }
+
+      const { data } = await guruFetch(`/cards/${cardId}/verifiers`, {
+        method: "POST",
+        body: JSON.stringify([verifier]),
+      });
+
+      return {
+        content: [{ type: "text", text: JSON.stringify(data, null, 2) }],
+      };
+    } catch (err) {
+      return { content: [{ type: "text", text: `Error setting verifier: ${err.message}` }], isError: true };
+    }
+  }
+);
+
 // Start the server
 const transport = new StdioServerTransport();
 await server.connect(transport);
